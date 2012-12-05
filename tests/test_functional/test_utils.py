@@ -4,6 +4,7 @@ from nose.tools import eq_, assert_raises
 
 from routes.util import controller_scan, GenerationException
 from routes import *
+from routes.six import u
 
 class TestUtils(unittest.TestCase):
     def setUp(self):
