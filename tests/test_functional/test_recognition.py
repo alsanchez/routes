@@ -7,6 +7,7 @@ import urllib
 from nose.tools import eq_, assert_raises
 from routes import *
 from routes.util import RoutesException
+from routes.six import u
 
 class TestRecognition(unittest.TestCase):
     

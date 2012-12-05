@@ -4,6 +4,7 @@ import urllib
 
 from nose.tools import eq_, assert_raises
 from routes import *
+from routes.six import u
 
 class TestGeneration(unittest.TestCase):
     
