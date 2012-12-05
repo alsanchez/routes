@@ -990,9 +990,9 @@ else:
         en = time.time()
         total = end-start-(en-ts)
         per_url = total / (n*10)
-        print "Recognition\n"
-        print "%s ms/url" % (per_url*1000)
-        print "%s urls/s\n" % (1.00/per_url)
+        print("Recognition\n")
+        print("%s ms/url" % (per_url*1000))
+        print("%s urls/s\n" % (1.00/per_url))
     
 """
 Copyright (c) 2005 Ben Bangert <ben@groovie.org>, Parachute
