@@ -36,7 +36,7 @@ class TestRecognition(unittest.TestCase):
         eq_({'controller':'content','action':'index'}, m.match('/hello/world/how/are/you'))
     
     def test_unicode(self):
-        hoge = u'\u30c6\u30b9\u30c8' # the word test in Japanese
+        hoge = u('\u30c6\u30b9\u30c8') # the word test in Japanese
         hoge_enc = hoge.encode('utf-8')
         m = Mapper(explicit=False)
         m.minimization = True
@@ -45,7 +45,7 @@ class TestRecognition(unittest.TestCase):
                          m.match('/' + hoge_enc))
     
     def test_disabling_unicode(self):
-        hoge = u'\u30c6\u30b9\u30c8' # the word test in Japanese
+        hoge = u('\u30c6\u30b9\u30c8') # the word test in Japanese
         hoge_enc = urllib.quote(hoge.encode('utf-8'))
         m = Mapper(explicit=False)
         m.minimization = True
@@ -892,16 +892,16 @@ class TestRecognition(unittest.TestCase):
         m.connect('sites/:site/pages/:page')
         m.create_regs(['content'])
         
-        eq_({'action': u'index', 'controller': u'content', 
-                          'site': u'python.com', 'page': u'index.html'}, 
+        eq_({'action': u('index'), 'controller': u('content'), 
+                          'site': u('python.com'), 'page': u('index.html')}, 
                          m.match('/sites/python.com/pages/index.html'))
         m = Mapper(explicit=False)
         m.minimization = True
         m.connect('sites/:site/pages/:page.:format', format='html')
         m.create_regs(['content'])
         
-        eq_({'action': u'index', 'controller': u'content', 
-                          'site': u'python.com', 'page': u'index', 'format': u'html'}, 
+        eq_({'action': u('index'), 'controller': u('content'), 
+                          'site': u('python.com'), 'page': u('index'), 'format': u('html')}, 
                          m.match('/sites/python.com/pages/index.html'))
         
     def test_empty_fails(self):

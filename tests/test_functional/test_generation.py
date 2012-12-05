@@ -401,7 +401,7 @@ class TestGeneration(unittest.TestCase):
         m = Mapper()
         m.connect(':something')
         thing = "whatever"
-        euro = u"\u20ac" # Euro symbol
+        euro = u("\u20ac") # Euro symbol
 
         eq_("/%s?extra=%%E2%%82%%AC" % thing, m.generate(something=thing, extra=euro))
 
@@ -409,7 +409,7 @@ class TestGeneration(unittest.TestCase):
         m = Mapper()
         m.connect(':something')
         thing = "whatever"
-        euro = [u"\u20ac", u"\xa3"] # Euro and Pound sterling symbols
+        euro = [u("\u20ac"), u("\xa3")] # Euro and Pound sterling symbols
 
         eq_("/%s?extra=%%E2%%82%%AC&extra=%%C2%%A3" % thing, m.generate(something=thing, extra=euro))
 
@@ -618,7 +618,7 @@ class TestGeneration(unittest.TestCase):
         eq_('/content/index-2.html', m.generate(controller='content', id=2))
     
     def test_unicode(self):
-        hoge = u'\u30c6\u30b9\u30c8' # the word test in Japanese
+        hoge = u('\u30c6\u30b9\u30c8') # the word test in Japanese
         hoge_enc = urllib.quote(hoge.encode('utf-8'))
         m = Mapper()
         m.connect(':hoge')
@@ -626,7 +626,7 @@ class TestGeneration(unittest.TestCase):
         self.assert_(isinstance(m.generate(hoge=hoge), str))
 
     def test_unicode_static(self):
-        hoge = u'\u30c6\u30b9\u30c8' # the word test in Japanese
+        hoge = u('\u30c6\u30b9\u30c8') # the word test in Japanese
         hoge_enc = urllib.quote(hoge.encode('utf-8'))
         m = Mapper()
         m.minimization = True

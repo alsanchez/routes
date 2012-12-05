@@ -5,6 +5,7 @@ from nose.tools import eq_, assert_raises
 from routes import *
 from routes.route import Route
 from routes.util import GenerationException
+from routes.six import u
 
 class TestUtils(unittest.TestCase):
     def test_route_dict_use(self):
@@ -46,14 +47,14 @@ class TestUtils(unittest.TestCase):
         
         environ = {'HTTP_HOST': 'localhost.com'}
         url = URLGenerator(m, environ)
-        eq_('http://home.localhost.com/hi/smith', url(fred='smith', sub_domain=u'home', qualified=True))
+        eq_('http://home.localhost.com/hi/smith', url(fred='smith', sub_domain=u('home'), qualified=True))
         
         environ = {'HTTP_HOST': 'here.localhost.com', 'PATH_INFO': '/hi/smith'}
         url = URLGenerator(m, environ.copy())
         assert_raises(GenerationException, lambda: url.current(qualified=True))
         
         url = URLGenerator(m, {})
-        eq_('/hi/smith', url(fred='smith', sub_domain=u'home'))
+        eq_('/hi/smith', url(fred='smith', sub_domain=u('home')))
 
     def test_anchor(self):
         m = Mapper()
@@ -71,7 +72,7 @@ class TestUtils(unittest.TestCase):
         
         url = URLGenerator(m, {})
         
-        eq_('/here?q=fred&q=here%20now', url('/here', q=[u'fred', 'here now']))
+        eq_('/here?q=fred&q=here%20now', url('/here', q=[u('fred'), 'here now']))
     
     def test_current(self):
         m = Mapper()

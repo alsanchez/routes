@@ -26,7 +26,7 @@ class TestUtils(unittest.TestCase):
         con.mapper_dict = {}
         
         eq_('/blog', url_for('/blog'))
-        eq_('/blog?q=fred&q=here%20now', url_for('/blog', q=['fred', u'here now']))
+        eq_('/blog?q=fred&q=here%20now', url_for('/blog', q=['fred', u('here now')]))
         eq_('/blog#here', url_for('/blog', anchor='here'))
 
     def test_url_for_with_nongen_no_encoding(self):
@@ -42,14 +42,14 @@ class TestUtils(unittest.TestCase):
         con.mapper_dict = {}
         
         eq_('/blog', url_for(controller='blog'))
-        eq_('/blog/view/umulat', url_for(controller='blog', action='view', id=u'umulat'))
+        eq_('/blog/view/umulat', url_for(controller='blog', action='view', id=u('umulat')))
         eq_('/blog/view/umulat?other=%CE%B1%CF%83%CE%B4%CE%B3', 
-            url_for(controller='blog', action='view', id=u'umulat', other=u'\u03b1\u03c3\u03b4\u03b3'))
+            url_for(controller='blog', action='view', id=u('umulat'), other=u('\u03b1\u03c3\u03b4\u03b3')))
         
         url = URLGenerator(con.mapper, {})
         for urlobj in [url_for, url]:
             def raise_url():
-                return urlobj(u'/some/stirng')
+                return urlobj(u('/some/stirng'))
             assert_raises(Exception, raise_url)
     
     def test_url_for(self):
