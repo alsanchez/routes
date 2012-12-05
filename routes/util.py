@@ -9,7 +9,7 @@ import os
 import re
 import urllib
 from routes import request_config
-from routes.six import iteritems, urllib_quote, text_type, to_text_type
+from routes.six import iteritems, urllib_quote, text_type, to_text_type, binary_type, to_binary_type
 
 
 class RoutesException(Exception):
@@ -78,7 +78,7 @@ def _subdomain_check(kargs, mapper, environ):
     if mapper.sub_domains:
         subdomain = kargs.pop('sub_domain', None)
         if isinstance(subdomain, text_type):
-            subdomain = str(subdomain)
+            subdomain = to_binary_type(subdomain)
         
         fullhost = environ.get('HTTP_HOST') or environ.get('SERVER_NAME')
         
@@ -109,13 +109,13 @@ def _url_quote(string, encoding):
     if encoding:
         if isinstance(string, text_type):
             s = string.encode(encoding)
-        elif isinstance(string, str):
+        elif isinstance(string, binary_type):
             # assume the encoding is already correct
             s = string
         else:
             s = to_text_type(string).encode(encoding)
     else:
-        s = str(string)
+        s = to_binary_type(string)
     return urllib_quote(s, '/')
 
 
@@ -123,7 +123,7 @@ def _str_encode(string, encoding):
     if encoding:
         if isinstance(string, text_type):
             s = string.encode(encoding)
-        elif isinstance(string, str):
+        elif isinstance(string, text_type):
             # assume the encoding is already correct
             s = string
         else:
@@ -261,7 +261,7 @@ def url_for(*args, **kargs):
         if url is not None:
             url = protocol + '://' + host + url
     
-    if not isinstance(url, str) and url is not None:
+    if not isinstance(url, binary_type) and url is not None:
         raise GenerationException("url_for can only return a string, got "
                         "unicode instead: %s" % url)
     if url is None:
@@ -412,7 +412,7 @@ class URLGenerator(object):
                     host += '/'
                 url = protocol + '://' + host + url.lstrip('/')
 
-        if not isinstance(url, str) and url is not None:
+        if not isinstance(url, binary_type) and url is not None:
             raise GenerationException("Can only return a string, got "
                             "unicode instead: %s" % url)
         if url is None:
