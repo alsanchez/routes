@@ -47,7 +47,7 @@ def _screenargs(kargs, mapper, environ, force_explicit=False):
         # If the controller name starts with '/', ignore route memory
         kargs['controller'] = kargs['controller'][1:]
         return kargs
-    elif controller_name and not kargs.has_key('action'):
+    elif controller_name and 'action' not in kargs:
         # Fill in an action if we don't have one, but have a controller
         kargs['action'] = 'index'
     
@@ -60,7 +60,7 @@ def _screenargs(kargs, mapper, environ, force_explicit=False):
     # Remove keys from memory and kargs if kargs has them as None
     for key in [key for key in kargs.keys() if kargs[key] is None]:
         del kargs[key]
-        if memory_kargs.has_key(key):
+        if key in memory_kargs:
             del memory_kargs[key]
     
     # Merge the new args on top of the memory args

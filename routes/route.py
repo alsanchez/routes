@@ -227,7 +227,7 @@ class Route(object):
             elif not isinstance(part, dict):
                 continue
             key = part['name']
-            if self.defaults.has_key(key) and not gaps:
+            if key in self.defaults and not gaps:
                 continue
             minkeys.append(key)
             gaps = True
@@ -260,10 +260,10 @@ class Route(object):
                 defaults[key] = self.make_unicode(kargs[key])
             else:
                 defaults[key] = None
-        if 'action' in routekeys and not defaults.has_key('action') \
+        if 'action' in routekeys and 'action' not in defaults \
            and not self.explicit:
             defaults['action'] = 'index'
-        if 'id' in routekeys and not defaults.has_key('id') \
+        if 'id' in routekeys and 'id' not in defaults \
            and not self.explicit:
             defaults['id'] = None
         newdefaultkeys = frozenset([key for key in defaults.keys() \
@@ -362,7 +362,7 @@ class Route(object):
             partreg = ''
             
             # First we plug in the proper part matcher
-            if self.reqs.has_key(var):
+            if var in self.reqs:
                 if include_names:
                     partreg = '(?P<%s>%s)' % (var, self.reqs[var])
                 else:
@@ -406,9 +406,9 @@ class Route(object):
                     else:
                         partreg = '(?:[^%s]+?)' % ''.join(rem)
             
-            if self.reqs.has_key(var):
+            if var in self.reqs:
                 noreqs = False
-            if not self.defaults.has_key(var): 
+            if var not in self.defaults: 
                 allblank = False
                 noreqs = False
             
@@ -421,23 +421,23 @@ class Route(object):
                 # regexp. Wrap to ensure that if we match anything, we match
                 # our regexp first. It's still possible we could be completely
                 # blank as we have a default
-                if self.reqs.has_key(var) and self.defaults.has_key(var):
+                if var in self.reqs and var in self.defaults:
                     reg = '(' + partreg + rest + ')?'
                 
                 # Or we have a regexp match with no default, so now being 
                 # completely blank form here on out isn't possible
-                elif self.reqs.has_key(var):
+                elif var in self.reqs:
                     allblank = False
                     reg = partreg + rest
                 
                 # If the character before this is a special char, it has to be
                 # followed by this
-                elif self.defaults.has_key(var) and \
+                elif var in self.defaults and \
                      self.prior in (',', ';', '.'):
                     reg = partreg + rest
                 
                 # Or we have a default with no regexp, don't touch the allblank
-                elif self.defaults.has_key(var):
+                elif var in self.defaults:
                     reg = partreg + '?' + rest
                 
                 # Or we have a key with no default, and no reqs. Not possible
@@ -452,7 +452,7 @@ class Route(object):
                 # its safe to make everything from here optional. Since 
                 # something else in the chain does have req's though, we have
                 # to make the partreg here required to continue matching
-                if allblank and self.defaults.has_key(var):
+                if allblank and var in self.defaults:
                     reg = '(' + partreg + rest + ')?'
                     
                 # Same as before, but they can't all be blank, so we have to 
@@ -466,16 +466,16 @@ class Route(object):
                     reg = '(?P<%s>.*)' % var + rest
                 else:
                     reg = '(?:.*)' + rest
-                if not self.defaults.has_key(var):
+                if var not in self.defaults:
                     allblank = False
                     noreqs = False
             else:
-                if allblank and self.defaults.has_key(var):
+                if allblank and var in self.defaults:
                     if include_names:
                         reg = '(?P<%s>.*)' % var + rest
                     else:
                         reg = '(?:.*)' + rest
-                elif self.defaults.has_key(var):
+                elif var in self.defaults:
                     if include_names:
                         reg = '(?P<%s>.*)' % var + rest
                     else:
@@ -622,8 +622,8 @@ class Route(object):
                 arg = part['name']
                 
                 # For efficiency, check these just once
-                has_arg = kargs.has_key(arg)
-                has_default = self.defaults.has_key(arg)
+                has_arg = arg in kargs
+                has_default = arg in self.defaults
                 
                 # Determine if we can leave this part off
                 # First check if the default exists and wasn't provided in the 

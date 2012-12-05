@@ -523,9 +523,9 @@ class Mapper(SubMapperParent):
         for route in self.matchlist:
             if route.static:
                 continue
-            if route.defaults.has_key('controller'):
+            if 'controller' in route.defaults:
                 controllerlist[route.defaults['controller']] = True
-            if route.defaults.has_key('action'):
+            if 'action' in route.defaults:
                 actionlist[route.defaults['action']] = True
         
         # Setup the lists of all controllers/actions we'll add each route
