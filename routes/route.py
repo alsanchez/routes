@@ -6,7 +6,7 @@ if sys.version < '2.4':
     from sets import ImmutableSet as frozenset
 
 from routes.util import _url_quote as url_quote, _str_encode
-from routes.six import iteritems, text_type, to_text_type
+from routes.six import iteritems, text_type, to_text_type, binary_type
 
 
 class Route(object):
@@ -558,7 +558,8 @@ class Route(object):
                 # change back into python unicode objects from the URL 
                 # representation
                 try:
-                    val = val and val.decode(self.encoding, self.decode_errors)
+                    if isinstance(val, binary_type):
+                        val = val.decode(self.encoding, self.decode_errors)
                 except UnicodeDecodeError:
                     return False
             
