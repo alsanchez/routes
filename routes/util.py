@@ -43,7 +43,7 @@ def _screenargs(kargs, mapper, environ, force_explicit=False):
     
     controller_name = kargs.get('controller')
     
-    if controller_name and controller_name.startswith(b'/'):
+    if controller_name and controller_name.startswith('/'):
         # If the controller name starts with '/', ignore route memory
         kargs['controller'] = kargs['controller'][1:]
         return kargs
@@ -188,7 +188,7 @@ def url_for(*args, **kargs):
     route = None
     static = False
     encoding = config.mapper.encoding
-    url = b''
+    url = ''
     if len(args) > 0:
         route = config.mapper._routenames.get(args[0])
         
@@ -197,13 +197,13 @@ def url_for(*args, **kargs):
             static = True
             url = args[0]
         
-        if url.startswith(b'/') and hasattr(config, 'environ') \
+        if url.startswith('/') and hasattr(config, 'environ') \
                 and config.environ.get('SCRIPT_NAME'):
             url = config.environ.get('SCRIPT_NAME') + url
         
         if static:
             if kargs:
-                url += b'?'
+                url += '?'
                 query_args = []
                 for key, val in iteritems(kargs):
                     if isinstance(val, (list, tuple)):
@@ -215,7 +215,7 @@ def url_for(*args, **kargs):
                         query_args.append("%s=%s" % (
                             urllib_quote(to_text_type(key).encode(encoding)),
                             urllib_quote(to_text_type(val).encode(encoding))))
-                url += b'&'.join(query_args)
+                url += '&'.join(query_args)
     environ = getattr(config, 'environ', {})
     if 'wsgiorg.routing_args' not in environ:
         environ = environ.copy()
@@ -248,7 +248,7 @@ def url_for(*args, **kargs):
         protocol = newargs.pop('_protocol', None) or protocol
         url = config.mapper.generate(*route_args, **newargs)
     if anchor is not None:
-        url += b'#' + _url_quote(anchor, encoding)
+        url += '#' + _url_quote(anchor, encoding)
     if host or protocol or qualified:
         if not host and not qualified:
             # Ensure we don't use a specific port, as changing the protocol
@@ -259,7 +259,7 @@ def url_for(*args, **kargs):
         if not protocol:
             protocol = config.protocol
         if url is not None:
-            url = protocol + b'://' + host + url
+            url = protocol + '://' + host + url
     
     if not isinstance(url, binary_type) and url is not None:
         raise GenerationException("url_for can only return a string, got "
@@ -332,7 +332,7 @@ class URLGenerator(object):
         
         static = False
         encoding = self.mapper.encoding
-        url = b''
+        url = ''
                 
         more_args = len(args) > 0
         if more_args:
@@ -341,12 +341,12 @@ class URLGenerator(object):
         if not route and more_args:
             static = True
             url = args[0]
-            if url.startswith(b'/') and self.environ.get('SCRIPT_NAME'):
+            if url.startswith('/') and self.environ.get('SCRIPT_NAME'):
                 url = self.environ.get('SCRIPT_NAME') + url
 
             if static:
                 if kargs:
-                    url += b'?'
+                    url += '?'
                     query_args = []
                     for key, val in iteritems(kargs):
                         if isinstance(val, (list, tuple)):
@@ -358,7 +358,7 @@ class URLGenerator(object):
                             query_args.append("%s=%s" % (
                                 urllib_quote(to_text_type(key).encode(encoding)),
                                 urllib_quote(to_text_type(val).encode(encoding))))
-                    url += b'&'.join(query_args)
+                    url += '&'.join(query_args)
         if not static:
             route_args = []
             if route:
@@ -393,7 +393,7 @@ class URLGenerator(object):
             newargs['_environ'] = self.environ
             url = self.mapper.generate(*route_args, **newargs)
         if anchor is not None:
-            url += b'#' + _url_quote(anchor, encoding)
+            url += '#' + _url_quote(anchor, encoding)
         if host or protocol or qualified:
             if 'routes.cached_hostinfo' not in self.environ:
                 cache_hostinfo(self.environ)
@@ -408,8 +408,8 @@ class URLGenerator(object):
             if not protocol:
                 protocol = hostinfo['protocol']
             if url is not None:
-                if host[-1] != b'/':
-                    host += b'/'
+                if host[-1] != '/':
+                    host += '/'
                 url = protocol + '://' + host + url.lstrip('/')
 
         if not isinstance(url, binary_type) and url is not None:
@@ -419,6 +419,7 @@ class URLGenerator(object):
             raise GenerationException(
                 "Could not generate URL. Called with args: %s %s" % \
                 (args, kargs))
+                
         return url
     
     def current(self, *args, **kwargs):

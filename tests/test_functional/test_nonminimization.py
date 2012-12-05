@@ -5,7 +5,7 @@ from nose.tools import eq_
 
 from routes import url_for
 from routes.mapper import Mapper
-from routes.six import u, urllib_quote
+from routes.six import u, urllib_quote, text_type, binary_type
 
 
 def test_basic():
@@ -25,8 +25,8 @@ def test_basic():
     
     # Generate
     eq_(None, m.generate(controller='content'))
-    eq_('/content/index/4', m.generate(controller='content', id=4))
-    eq_('/content/view/3', m.generate(controller='content', action='view', id=3))
+    eq_(b'/content/index/4', m.generate(controller='content', id=4))
+    eq_(b'/content/view/3', m.generate(controller='content', action='view', id=3))
 
 def test_full():
     m = Mapper(explicit=False)
@@ -50,9 +50,9 @@ def test_full():
     
     # Looks odd, but only controller/action are set with non-explicit, so we
     # do need the id to match
-    eq_('/content/index/', m.generate(controller='content', id=None))
-    eq_('/content/index/4', m.generate(controller='content', id=4))
-    eq_('/content/view/3', m.generate(controller='content', action='view', id=3))
+    eq_(b'/content/index/', m.generate(controller='content', id=None))
+    eq_(b'/content/index/4', m.generate(controller='content', id=4))
+    eq_(b'/content/view/3', m.generate(controller='content', action='view', id=3))
 
 def test_action_required():
     m = Mapper()
@@ -63,7 +63,7 @@ def test_action_required():
     
     eq_(None, m.generate(controller='content'))
     eq_(None, m.generate(controller='content', action='fred'))
-    eq_('/content/index', m.generate(controller='content', action='index'))
+    eq_(b'/content/index', m.generate(controller='content', action='index'))
 
 def test_query_params():
     m = Mapper()
@@ -73,7 +73,7 @@ def test_query_params():
     m.create_regs(['content'])
     
     eq_(None, m.generate(controller='content'))
-    eq_('/content/index?test=sample', 
+    eq_(b'/content/index?test=sample', 
         m.generate(controller='content', action='index', test='sample'))
     
 
@@ -92,8 +92,8 @@ def test_syntax():
     
     # Generate
     eq_(None, m.generate(controller='content'))
-    eq_('/content/index/4', m.generate(controller='content', id=4))
-    eq_('/content/view/3', m.generate(controller='content', action='view', id=3))
+    eq_(b'/content/index/4', m.generate(controller='content', id=4))
+    eq_(b'/content/view/3', m.generate(controller='content', action='view', id=3))
 
 def test_regexp_syntax():
     m = Mapper(explicit=False)
@@ -112,8 +112,8 @@ def test_regexp_syntax():
     # Generate
     eq_(None, m.generate(controller='content'))
     eq_(None, m.generate(controller='content', id=4))
-    eq_('/content/index/43', m.generate(controller='content', id=43))
-    eq_('/content/view/31', m.generate(controller='content', action='view', id=31))
+    eq_(b'/content/index/43', m.generate(controller='content', id=43))
+    eq_(b'/content/view/31', m.generate(controller='content', action='view', id=31))
 
 def test_unicode():
     hoge = u('\u30c6\u30b9\u30c8') # the word test in Japanese
@@ -121,8 +121,8 @@ def test_unicode():
     m = Mapper()
     m.minimization = False
     m.connect(':hoge')
-    eq_("/%s" % hoge_enc, m.generate(hoge=hoge))
-    assert isinstance(m.generate(hoge=hoge), str)
+    eq_(b"/%s" % hoge_enc, m.generate(hoge=hoge))
+    assert isinstance(m.generate(hoge=hoge), binary_type)
 
 def test_unicode_static():
     hoge = u('\u30c6\u30b9\u30c8') # the word test in Japanese
@@ -131,9 +131,9 @@ def test_unicode_static():
     m.minimization = False
     m.connect('google-jp', 'http://www.google.co.jp/search', _static=True)
     m.create_regs(['messages'])
-    eq_("http://www.google.co.jp/search?q=" + hoge_enc,
+    eq_(b"http://www.google.co.jp/search?q=" + hoge_enc,
                      url_for('google-jp', q=hoge))
-    assert isinstance(url_for('google-jp', q=hoge), str)
+    assert isinstance(url_for('google-jp', q=hoge), binary_type)
 
 def test_other_special_chars():
     m = Mapper()
@@ -141,5 +141,5 @@ def test_other_special_chars():
     m.connect('/:year/:(slug).:(format),:(locale)', locale='en', format='html')
     m.create_regs(['content'])
     
-    eq_('/2007/test.xml,ja', m.generate(year=2007, slug='test', format='xml', locale='ja'))
+    eq_(b'/2007/test.xml,ja', m.generate(year=2007, slug='test', format='xml', locale='ja'))
     eq_(None, m.generate(year=2007, format='html'))

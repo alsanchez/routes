@@ -6,7 +6,7 @@ from routes import *
 
 class TestResourceGeneration(unittest.TestCase):
     def _assert_restful_routes(self, m, options, path_prefix=''):
-        baseroute = '/' + path_prefix + options['controller']
+        baseroute = b'/' + path_prefix + options['controller']
         eq_(baseroute, m.generate(action='index', **options))
         eq_(baseroute + '.xml', m.generate(action='index', format='xml', **options))
         eq_(baseroute + '/new', m.generate(action='new', **options))
@@ -25,14 +25,14 @@ class TestResourceGeneration(unittest.TestCase):
         m.resource('passage', 'passages')
         m.create_regs(['messages'])
         options = dict(controller='messages')
-        eq_('/messages', url_for('messages'))
-        eq_('/messages.xml', url_for('formatted_messages', format='xml'))
-        eq_('/messages/1', url_for('message', id=1))
-        eq_('/messages/1.xml', url_for('formatted_message', id=1, format='xml'))
-        eq_('/messages/new', url_for('new_message'))
-        eq_('/messages/1.xml', url_for('formatted_message', id=1, format='xml'))
-        eq_('/messages/1/edit', url_for('edit_message', id=1))
-        eq_('/messages/1/edit.xml', url_for('formatted_edit_message', id=1, format='xml'))
+        eq_(b'/messages', url_for('messages'))
+        eq_(b'/messages.xml', url_for('formatted_messages', format='xml'))
+        eq_(b'/messages/1', url_for('message', id=1))
+        eq_(b'/messages/1.xml', url_for('formatted_message', id=1, format='xml'))
+        eq_(b'/messages/new', url_for('new_message'))
+        eq_(b'/messages/1.xml', url_for('formatted_message', id=1, format='xml'))
+        eq_(b'/messages/1/edit', url_for('edit_message', id=1))
+        eq_(b'/messages/1/edit.xml', url_for('formatted_edit_message', id=1, format='xml'))
         self._assert_restful_routes(m, options)
     
     def test_resources_with_path_prefix(self):
@@ -48,10 +48,10 @@ class TestResourceGeneration(unittest.TestCase):
         m.create_regs(['messages'])
         options = dict(controller='messages')
         self._assert_restful_routes(m, options)
-        eq_('/messages/rss', m.generate(controller='messages', action='rss'))
-        eq_('/messages/rss', url_for('rss_messages'))
-        eq_('/messages/rss.xml', m.generate(controller='messages', action='rss', format='xml'))
-        eq_('/messages/rss.xml', url_for('formatted_rss_messages', format='xml'))
+        eq_(b'/messages/rss', m.generate(controller='messages', action='rss'))
+        eq_(b'/messages/rss', url_for('rss_messages'))
+        eq_(b'/messages/rss.xml', m.generate(controller='messages', action='rss', format='xml'))
+        eq_(b'/messages/rss.xml', url_for('formatted_rss_messages', format='xml'))
     
     def test_resources_with_member_action(self):
         for method in ['put', 'post']:
@@ -60,8 +60,8 @@ class TestResourceGeneration(unittest.TestCase):
             m.create_regs(['messages'])
             options = dict(controller='messages')
             self._assert_restful_routes(m, options)
-            eq_('/messages/1/mark', m.generate(method=method, action='mark', id='1', **options))
-            eq_('/messages/1/mark.xml', 
+            eq_(b'/messages/1/mark', m.generate(method=method, action='mark', id='1', **options))
+            eq_(b'/messages/1/mark.xml', 
                 m.generate(method=method, action='mark', id='1', format='xml', **options))
     
     def test_resources_with_new_action(self):
@@ -70,11 +70,11 @@ class TestResourceGeneration(unittest.TestCase):
         m.create_regs(['messages'])
         options = dict(controller='messages')
         self._assert_restful_routes(m, options)
-        eq_('/messages/new/preview', m.generate(controller='messages', action='preview', method='post'))
-        eq_('/messages/new/preview', url_for('preview_new_message'))
-        eq_('/messages/new/preview.xml', 
+        eq_(b'/messages/new/preview', m.generate(controller='messages', action='preview', method='post'))
+        eq_(b'/messages/new/preview', url_for('preview_new_message'))
+        eq_(b'/messages/new/preview.xml', 
             m.generate(controller='messages', action='preview', method='post', format='xml'))
-        eq_('/messages/new/preview.xml', url_for('formatted_preview_new_message', format='xml'))
+        eq_(b'/messages/new/preview.xml', url_for('formatted_preview_new_message', format='xml'))
     
     def test_resources_with_name_prefix(self):
         m = Mapper()
@@ -82,7 +82,7 @@ class TestResourceGeneration(unittest.TestCase):
         m.create_regs(['messages'])
         options = dict(controller='messages')
         self._assert_restful_routes(m, options)
-        eq_('/messages/new/preview', url_for('category_preview_new_message'))
+        eq_(b'/messages/new/preview', url_for('category_preview_new_message'))
         assert_raises(Exception, url_for, 'category_preview_new_message', method='get')
 
 
@@ -198,41 +198,41 @@ class TestResourceRecognition(unittest.TestCase):
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'action': 'index'})
         url = url_for('region_locations', region_id=13)
-        eq_(url, '/regions/13/locations')
+        eq_(url, b'/regions/13/locations')
         
         test_path('/regions/13/locations', 'POST')
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'action': 'create'})
         # new
         url = url_for('region_new_location', region_id=13)
-        eq_(url, '/regions/13/locations/new')
+        eq_(url, b'/regions/13/locations/new')
         # create
         url = url_for('region_locations', region_id=13)
-        eq_(url, '/regions/13/locations')
+        eq_(url, b'/regions/13/locations')
         
         test_path('/regions/13/locations/60', 'GET')
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'id': '60', 'action': 'show'})
         url = url_for('region_location', region_id=13, id=60)
-        eq_(url, '/regions/13/locations/60')
+        eq_(url, b'/regions/13/locations/60')
         
         test_path('/regions/13/locations/60/edit', 'GET')
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'id': '60', 'action': 'edit'})
         url = url_for('region_edit_location', region_id=13, id=60)
-        eq_(url, '/regions/13/locations/60/edit')
+        eq_(url, b'/regions/13/locations/60/edit')
         
         test_path('/regions/13/locations/60', 'DELETE')
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'id': '60', 'action': 'delete'})
         url = url_for('region_location', region_id=13, id=60)
-        eq_(url, '/regions/13/locations/60')
+        eq_(url, b'/regions/13/locations/60')
         
         test_path('/regions/13/locations/60', 'PUT')
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'id': '60', 'action': 'update'})
         url = url_for('region_location', region_id=13, id=60)
-        eq_(url, '/regions/13/locations/60')
+        eq_(url, b'/regions/13/locations/60')
     
         # Make sure ``path_prefix`` overrides work
         # empty ``path_prefix`` (though I'm not sure why someone would do this)
@@ -242,7 +242,7 @@ class TestResourceRecognition(unittest.TestCase):
                                         collection_name='regions'),
                    path_prefix='')
         url = url_for('region_locations')
-        eq_(url, '/locations')
+        eq_(url, b'/locations')
         # different ``path_prefix``
         m = Mapper()
         m.resource('location', 'locations',
@@ -250,7 +250,7 @@ class TestResourceRecognition(unittest.TestCase):
                                         collection_name='regions'),
                    path_prefix='areas/:area_id')
         url = url_for('region_locations', area_id=51)
-        eq_(url, '/areas/51/locations')
+        eq_(url, b'/areas/51/locations')
 
         # Make sure ``name_prefix`` overrides work
         # empty ``name_prefix``
@@ -260,7 +260,7 @@ class TestResourceRecognition(unittest.TestCase):
                                         collection_name='regions'),
                    name_prefix='')
         url = url_for('locations', region_id=51)
-        eq_(url, '/regions/51/locations')
+        eq_(url, b'/regions/51/locations')
         # different ``name_prefix``
         m = Mapper()
         m.resource('location', 'locations',
@@ -268,7 +268,7 @@ class TestResourceRecognition(unittest.TestCase):
                                         collection_name='regions'),
                    name_prefix='area_')
         url = url_for('area_locations', region_id=51)
-        eq_(url, '/regions/51/locations')
+        eq_(url, b'/regions/51/locations')
 
         # Make sure ``path_prefix`` and ``name_prefix`` overrides work together
         # empty ``path_prefix``
@@ -279,7 +279,7 @@ class TestResourceRecognition(unittest.TestCase):
                    path_prefix='',
                    name_prefix='place_')
         url = url_for('place_locations')
-        eq_(url, '/locations')
+        eq_(url, b'/locations')
         # empty ``name_prefix``
         m = Mapper()
         m.resource('location', 'locations',
@@ -288,7 +288,7 @@ class TestResourceRecognition(unittest.TestCase):
                    path_prefix='areas/:area_id',
                    name_prefix='')
         url = url_for('locations', area_id=51)
-        eq_(url, '/areas/51/locations')
+        eq_(url, b'/areas/51/locations')
         # different ``path_prefix`` and ``name_prefix``
         m = Mapper()
         m.resource('location', 'locations',
@@ -297,7 +297,7 @@ class TestResourceRecognition(unittest.TestCase):
                    path_prefix='areas/:area_id',
                    name_prefix='place_')
         url = url_for('place_locations', area_id=51)
-        eq_(url, '/areas/51/locations')
+        eq_(url, b'/areas/51/locations')
 
     def test_resource_created_with_parent_resource_nomin(self): 
         m = Mapper()
@@ -319,41 +319,41 @@ class TestResourceRecognition(unittest.TestCase):
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'action': 'index'})
         url = url_for('region_locations', region_id=13)
-        eq_(url, '/regions/13/locations')
+        eq_(url, b'/regions/13/locations')
         
         test_path('/regions/13/locations', 'POST')
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'action': 'create'})
         # new
         url = url_for('region_new_location', region_id=13)
-        eq_(url, '/regions/13/locations/new')
+        eq_(url, b'/regions/13/locations/new')
         # create
         url = url_for('region_locations', region_id=13)
-        eq_(url, '/regions/13/locations')
+        eq_(url, b'/regions/13/locations')
         
         test_path('/regions/13/locations/60', 'GET')
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'id': '60', 'action': 'show'}) 
         url = url_for('region_location', region_id=13, id=60)               
-        eq_(url, '/regions/13/locations/60')                                
+        eq_(url, b'/regions/13/locations/60')                                
                                                                             
         test_path('/regions/13/locations/60/edit', 'GET')                   
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'id': '60', 'action': 'edit'}) 
         url = url_for('region_edit_location', region_id=13, id=60)          
-        eq_(url, '/regions/13/locations/60/edit')                           
+        eq_(url, b'/regions/13/locations/60/edit')                           
                                                                             
         test_path('/regions/13/locations/60', 'DELETE')                     
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'id': '60', 'action': 'delete'}) 
         url = url_for('region_location', region_id=13, id=60)               
-        eq_(url, '/regions/13/locations/60')                                
+        eq_(url, b'/regions/13/locations/60')                                
                                                                             
         test_path('/regions/13/locations/60', 'PUT')                        
         eq_(con.mapper_dict, {'region_id': '13', 'controller': 'locations',
                                    'id': '60', 'action': 'update'})
         url = url_for('region_location', region_id=13, id=60)
-        eq_(url, '/regions/13/locations/60')
+        eq_(url, b'/regions/13/locations/60')
     
         # Make sure ``path_prefix`` overrides work
         # empty ``path_prefix`` (though I'm not sure why someone would do this)
@@ -363,7 +363,7 @@ class TestResourceRecognition(unittest.TestCase):
                                         collection_name='regions'),
                    path_prefix='/')
         url = url_for('region_locations')
-        eq_(url, '/locations')
+        eq_(url, b'/locations')
         # different ``path_prefix``
         m = Mapper()
         m.resource('location', 'locations',
@@ -371,7 +371,7 @@ class TestResourceRecognition(unittest.TestCase):
                                         collection_name='regions'),
                    path_prefix='areas/:area_id')
         url = url_for('region_locations', area_id=51)
-        eq_(url, '/areas/51/locations')
+        eq_(url, b'/areas/51/locations')
 
         # Make sure ``name_prefix`` overrides work
         # empty ``name_prefix``
@@ -381,7 +381,7 @@ class TestResourceRecognition(unittest.TestCase):
                                         collection_name='regions'),
                    name_prefix='')
         url = url_for('locations', region_id=51)
-        eq_(url, '/regions/51/locations')
+        eq_(url, b'/regions/51/locations')
         # different ``name_prefix``
         m = Mapper()
         m.resource('location', 'locations',
@@ -389,7 +389,7 @@ class TestResourceRecognition(unittest.TestCase):
                                         collection_name='regions'),
                    name_prefix='area_')
         url = url_for('area_locations', region_id=51)
-        eq_(url, '/regions/51/locations')
+        eq_(url, b'/regions/51/locations')
 
         # Make sure ``path_prefix`` and ``name_prefix`` overrides work together
         # empty ``path_prefix``
@@ -400,7 +400,7 @@ class TestResourceRecognition(unittest.TestCase):
                    path_prefix='',
                    name_prefix='place_')
         url = url_for('place_locations')
-        eq_(url, '/locations')
+        eq_(url, b'/locations')
         # empty ``name_prefix``
         m = Mapper()
         m.resource('location', 'locations',
@@ -409,7 +409,7 @@ class TestResourceRecognition(unittest.TestCase):
                    path_prefix='areas/:area_id',
                    name_prefix='')
         url = url_for('locations', area_id=51)
-        eq_(url, '/areas/51/locations')
+        eq_(url, b'/areas/51/locations')
         # different ``path_prefix`` and ``name_prefix``
         m = Mapper()
         m.resource('location', 'locations',
@@ -418,7 +418,7 @@ class TestResourceRecognition(unittest.TestCase):
                    path_prefix='areas/:area_id',
                    name_prefix='place_')
         url = url_for('place_locations', area_id=51)
-        eq_(url, '/areas/51/locations')
+        eq_(url, b'/areas/51/locations')
 
         
 
