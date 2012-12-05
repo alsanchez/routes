@@ -6,7 +6,7 @@ if sys.version < '2.4':
     from sets import ImmutableSet as frozenset
 
 from routes.util import _url_quote as url_quote, _str_encode
-from routes.six import iteritems, text_type
+from routes.six import iteritems, text_type, to_text_type
 
 
 class Route(object):
@@ -141,7 +141,7 @@ class Route(object):
         elif callable(s):
             return s
         else:
-            return unicode(s)
+            return to_text_type(s)
     
     def _pathkeys(self, routepath):
         """Utility function to walk the route, and pull out the valid

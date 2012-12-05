@@ -9,7 +9,7 @@ import os
 import re
 import urllib
 from routes import request_config
-from routes.six import iteritems, urllib_quote, text_type
+from routes.six import iteritems, urllib_quote, text_type, to_text_type
 
 
 class RoutesException(Exception):
@@ -113,7 +113,7 @@ def _url_quote(string, encoding):
             # assume the encoding is already correct
             s = string
         else:
-            s = unicode(string).encode(encoding)
+            s = to_text_type(string).encode(encoding)
     else:
         s = str(string)
     return urllib_quote(s, '/')
@@ -127,7 +127,7 @@ def _str_encode(string, encoding):
             # assume the encoding is already correct
             s = string
         else:
-            s = unicode(string).encode(encoding)
+            s = to_text_type(string).encode(encoding)
     return s
 
 
@@ -209,12 +209,12 @@ def url_for(*args, **kargs):
                     if isinstance(val, (list, tuple)):
                         for value in val:
                             query_args.append("%s=%s" % (
-                                urllib_quote(unicode(key).encode(encoding)),
-                                urllib_quote(unicode(value).encode(encoding))))
+                                urllib_quote(to_text_type(key).encode(encoding)),
+                                urllib_quote(to_text_type(value).encode(encoding))))
                     else:
                         query_args.append("%s=%s" % (
-                            urllib_quote(unicode(key).encode(encoding)),
-                            urllib_quote(unicode(val).encode(encoding))))
+                            urllib_quote(to_text_type(key).encode(encoding)),
+                            urllib_quote(to_text_type(val).encode(encoding))))
                 url += '&'.join(query_args)
     environ = getattr(config, 'environ', {})
     if 'wsgiorg.routing_args' not in environ:
@@ -352,12 +352,12 @@ class URLGenerator(object):
                         if isinstance(val, (list, tuple)):
                             for value in val:
                                 query_args.append("%s=%s" % (
-                                    urllib_quote(unicode(key).encode(encoding)),
-                                    urllib_quote(unicode(value).encode(encoding))))
+                                    urllib_quote(to_text_type(key).encode(encoding)),
+                                    urllib_quote(to_text_type(value).encode(encoding))))
                         else:
                             query_args.append("%s=%s" % (
-                                urllib_quote(unicode(key).encode(encoding)),
-                                urllib_quote(unicode(val).encode(encoding))))
+                                urllib_quote(to_text_type(key).encode(encoding)),
+                                urllib_quote(to_text_type(val).encode(encoding))))
                     url += '&'.join(query_args)
         if not static:
             route_args = []

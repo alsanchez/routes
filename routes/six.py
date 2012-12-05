@@ -388,10 +388,24 @@ def with_metaclass(meta, base=object):
     return meta("NewBase", (base,), {})
 
 if PY3:
+  
   import urllib.parse  
+  
   def urllib_quote(string, safe='/', encoding=None, errors=None):
     return urllib.parse.quote(string, safe, encoding, errors)
+  
+  def to_text_type(obj):
+    if isinstance(obj, text_type):
+      return obj
+    else:
+      return str(obj)
+  
 else:
+  
   import urllib
+  
   def urllib_quote(string, safe='/', encoding=None, errors=None):
     return urllib.quote(string, safe, encoding, errors)
+  
+  def to_text_type(obj):
+    return unicode(obj)

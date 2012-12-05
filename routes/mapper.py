@@ -9,7 +9,7 @@ from repoze.lru import LRUCache
 from routes import request_config
 from routes.util import controller_scan, MatchException, RoutesException
 from routes.route import Route
-from routes.six import iteritems
+from routes.six import iteritems, to_text_type
 
 
 COLLECTION_ACTIONS = ['index', 'create', 'new']
@@ -546,7 +546,7 @@ class Mapper(SubMapperParent):
             if 'controller' in route.hardcoded:
                 clist = [route.defaults['controller']]
             if 'action' in route.hardcoded:
-                alist = [unicode(route.defaults['action'])]
+                alist = [to_text_type(route.defaults['action'])]
             for controller in clist:
                 for action in alist:
                     actiondict = gendict.setdefault(controller, {})
@@ -727,8 +727,8 @@ class Mapper(SubMapperParent):
         # If the URL didn't depend on the SCRIPT_NAME, we'll cache it
         # keyed by just by kargs; otherwise we need to cache it with
         # both SCRIPT_NAME and kargs:
-        cache_key = unicode(args).encode('utf8') + \
-            unicode(kargs).encode('utf8')
+        cache_key = to_text_type(args).encode('utf8') + \
+            to_text_type(kargs).encode('utf8')
         
         if self.urlcache is not None:
             if self.environ:
@@ -753,7 +753,7 @@ class Mapper(SubMapperParent):
 
         keys = frozenset(kargs.keys())
         cacheset = False
-        cachekey = unicode(keys)
+        cachekey = to_text_type(keys)
         cachelist = sortcache.get(cachekey)
         if args:
             keylist = args
@@ -818,7 +818,7 @@ class Mapper(SubMapperParent):
                 if isinstance(kval, str):
                     kval = kval.decode(self.encoding)
                 else:
-                    kval = unicode(kval)
+                    kval = to_text_type(kval)
                 if kval != route.defaults[key] and not callable(route.defaults[key]):
                     fail = True
                     break
