@@ -6,6 +6,7 @@ if sys.version < '2.4':
     from sets import ImmutableSet as frozenset
 
 from routes.util import _url_quote as url_quote, _str_encode
+from routes.six import iteritems
 
 
 class Route(object):
@@ -98,7 +99,7 @@ class Route(object):
         
         # Build a req list with all the regexp requirements for our args
         self.req_regs = {}
-        for key, val in self.reqs.iteritems():
+        for key, val in iteritems(self.reqs):
             self.req_regs[key] = re.compile('^' + val + '$')
         # Update our defaults and set new default keys if needed. defaults
         # needs to be saved
@@ -552,7 +553,7 @@ class Route(object):
         matchdict = match.groupdict()
         result = {}
         extras = self._default_keys - frozenset(matchdict.keys())
-        for key, val in matchdict.iteritems():
+        for key, val in iteritems(matchdict):
             if key != 'path_info' and self.encoding:
                 # change back into python unicode objects from the URL 
                 # representation

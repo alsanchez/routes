@@ -9,6 +9,7 @@ from repoze.lru import LRUCache
 from routes import request_config
 from routes.util import controller_scan, MatchException, RoutesException
 from routes.route import Route
+from routes.six import iteritems
 
 
 COLLECTION_ACTIONS = ['index', 'create', 'new']
@@ -575,7 +576,7 @@ class Mapper(SubMapperParent):
             else:
                 clist = self.controller_scan
         
-        for key, val in self.maxkeys.iteritems():
+        for key, val in iteritems(self.maxkeys):
             for route in val:
                 route.makeregexp(clist)
         
@@ -1003,7 +1004,7 @@ class Mapper(SubMapperParent):
         def swap(dct, newdct):
             """Swap the keys and values in the dict, and uppercase the values
             from the dict during the swap."""
-            for key, val in dct.iteritems():
+            for key, val in iteritems(dct):
                 newdct.setdefault(val.upper(), []).append(key)
             return newdct
         collection_methods = swap(collection, {})
@@ -1044,7 +1045,7 @@ class Mapper(SubMapperParent):
             return opts
         
         # Add the routes for handling collection methods
-        for method, lst in collection_methods.iteritems():
+        for method, lst in iteritems(collection_methods):
             primary = (method != 'GET' and lst.pop(0)) or None
             route_options = requirements_for(method)
             for action in lst:
@@ -1068,7 +1069,7 @@ class Mapper(SubMapperParent):
                      action='index', conditions={'method':['GET']}, **options)
         
         # Add the routes that deal with new resource methods
-        for method, lst in new_methods.iteritems():
+        for method, lst in iteritems(new_methods):
             route_options = requirements_for(method)
             for action in lst:
                 path = (action == 'new' and new_path) or "%s/%s" % (new_path, 
@@ -1086,7 +1087,7 @@ class Mapper(SubMapperParent):
         requirements_regexp = '[^\/]+(?<!\\\)'
 
         # Add the routes that deal with member methods of a resource
-        for method, lst in member_methods.iteritems():
+        for method, lst in iteritems(member_methods):
             route_options = requirements_for(method)
             route_options['requirements'] = {'id':requirements_regexp}
             if method not in ['POST', 'GET', 'any']:

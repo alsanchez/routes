@@ -9,6 +9,7 @@ import os
 import re
 import urllib
 from routes import request_config
+from routes.six import iteritems
 
 
 class RoutesException(Exception):
@@ -31,7 +32,7 @@ def _screenargs(kargs, mapper, environ, force_explicit=False):
     """
     # Coerce any unicode args with the encoding
     encoding = mapper.encoding
-    for key, val in kargs.iteritems():
+    for key, val in iteritems(kargs):
         if isinstance(val, unicode):
             kargs[key] = val.encode(encoding)
     
@@ -204,7 +205,7 @@ def url_for(*args, **kargs):
             if kargs:
                 url += '?'
                 query_args = []
-                for key, val in kargs.iteritems():
+                for key, val in iteritems(kargs):
                     if isinstance(val, (list, tuple)):
                         for value in val:
                             query_args.append("%s=%s" % (
@@ -347,7 +348,7 @@ class URLGenerator(object):
                 if kargs:
                     url += '?'
                     query_args = []
-                    for key, val in kargs.iteritems():
+                    for key, val in iteritems(kargs):
                         if isinstance(val, (list, tuple)):
                             for value in val:
                                 query_args.append("%s=%s" % (
