@@ -123,7 +123,7 @@ def _str_encode(string, encoding):
     if encoding:
         if isinstance(string, text_type):
             s = string.encode(encoding)
-        elif isinstance(string, text_type):
+        elif isinstance(string, binary_type):
             # assume the encoding is already correct
             s = string
         else:
@@ -195,7 +195,7 @@ def url_for(*args, **kargs):
         # No named route found, assume the argument is a relative path
         if not route:
             static = True
-            url = urllib_urlencode(args[0])
+            url = args[0]
         
         if url.startswith(b'/') and hasattr(config, 'environ') \
                 and config.environ.get('SCRIPT_NAME'):
