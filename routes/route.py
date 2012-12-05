@@ -6,7 +6,7 @@ if sys.version < '2.4':
     from sets import ImmutableSet as frozenset
 
 from routes.util import _url_quote as url_quote, _str_encode
-from routes.six import iteritems
+from routes.six import iteritems, text_type
 
 
 class Route(object):
@@ -134,7 +134,7 @@ class Route(object):
     
     def make_unicode(self, s):
         """Transform the given argument into a unicode string."""
-        if isinstance(s, unicode):
+        if isinstance(s, text_type):
             return s
         elif isinstance(s, str):
             return s.decode(self.encoding)

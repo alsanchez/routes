@@ -9,7 +9,7 @@ import os
 import re
 import urllib
 from routes import request_config
-from routes.six import iteritems, urllib_quote
+from routes.six import iteritems, urllib_quote, text_type
 
 
 class RoutesException(Exception):
@@ -33,7 +33,7 @@ def _screenargs(kargs, mapper, environ, force_explicit=False):
     # Coerce any unicode args with the encoding
     encoding = mapper.encoding
     for key, val in iteritems(kargs):
-        if isinstance(val, unicode):
+        if isinstance(val, text_type):
             kargs[key] = val.encode(encoding)
     
     if mapper.explicit and mapper.sub_domains and not force_explicit:
@@ -77,7 +77,7 @@ def _subdomain_check(kargs, mapper, environ):
     on the current subdomain or lack therof."""
     if mapper.sub_domains:
         subdomain = kargs.pop('sub_domain', None)
-        if isinstance(subdomain, unicode):
+        if isinstance(subdomain, text_type):
             subdomain = str(subdomain)
         
         fullhost = environ.get('HTTP_HOST') or environ.get('SERVER_NAME')
@@ -107,7 +107,7 @@ def _subdomain_check(kargs, mapper, environ):
 def _url_quote(string, encoding):
     """A Unicode handling version of urllib.quote."""
     if encoding:
-        if isinstance(string, unicode):
+        if isinstance(string, text_type):
             s = string.encode(encoding)
         elif isinstance(string, str):
             # assume the encoding is already correct
@@ -121,7 +121,7 @@ def _url_quote(string, encoding):
 
 def _str_encode(string, encoding):
     if encoding:
-        if isinstance(string, unicode):
+        if isinstance(string, text_type):
             s = string.encode(encoding)
         elif isinstance(string, str):
             # assume the encoding is already correct
