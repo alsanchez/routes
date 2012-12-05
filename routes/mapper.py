@@ -9,7 +9,7 @@ from repoze.lru import LRUCache
 from routes import request_config
 from routes.util import controller_scan, MatchException, RoutesException
 from routes.route import Route
-from routes.six import iteritems, to_text_type
+from routes.six import iteritems, to_text_type, cmp2key, compare
 
 
 COLLECTION_ACTIONS = ['index', 'create', 'new']
@@ -790,20 +790,21 @@ class Mapper(SubMapperParent):
                 
                 # Neither matches exactly, return the one with the most in 
                 # common
-                if cmp(lendiffa, lendiffb) != 0:
-                    return cmp(lendiffa, lendiffb)
+                if compare(lendiffa, lendiffb) != 0:
+                    return compare(lendiffa, lendiffb)
                 
                 # Neither matches exactly, but if they both have just as much 
                 # in common
                 if len(keys&b) == len(keys&a):
                     # Then we return the shortest of the two
-                    return cmp(len(a), len(b))
+                    return compare(len(a), len(b))
                 
                 # Otherwise, we return the one that has the most in common
                 else:
-                    return cmp(len(keys&b), len(keys&a))
+                    return compare(len(keys&b), len(keys&a))
             
-            keylist.sort(keysort)
+            keylist.sort(key=cmp2key(keysort))
+            
             if cacheset:
                 sortcache[cachekey] = keylist
                 

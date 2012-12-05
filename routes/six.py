@@ -409,3 +409,20 @@ else:
   
   def to_text_type(obj):
     return unicode(obj)
+  
+def cmp2key(mycmp):
+    "Converts a cmp= function into a key= function"
+    class K:
+        def __init__(self, obj, *args):
+            self.obj = obj
+        def __lt__(self, other):
+            return mycmp(self.obj, other.obj) < 0
+    return K
+  
+def compare(obj1, obj2):
+  if obj1 < obj2:
+    return -1
+  elif obj1  <obj2:
+    return 1
+  else:
+    return 0

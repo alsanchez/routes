@@ -497,9 +497,6 @@ def controller_scan(directory=None):
                 controllers.extend(find_controllers(filename, 
                                                     prefix=prefix+fname+'/'))
         return controllers
-    def longest_first(fst, lst):
-        """Compare the length of one string to another, shortest goes first"""
-        return cmp(len(lst), len(fst))
     controllers = find_controllers(directory)
-    controllers.sort(longest_first)
+    controllers.sort(key=lambda x: len(x), reverse=True)
     return controllers
