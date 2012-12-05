@@ -6,7 +6,7 @@ if sys.version < '2.4':
     from sets import ImmutableSet as frozenset
 
 from routes.util import _url_quote as url_quote, _str_encode
-from routes.six import iteritems, text_type, to_text_type, binary_type
+from routes.six import iteritems, text_type, to_text_type, binary_type, urllib_urlencode
 
 
 class Route(object):
@@ -738,7 +738,7 @@ class Route(object):
                     fragments.append((key, _str_encode(val, self.encoding)))
             if fragments:
                 url += '?'
-                url += urllib.urlencode(fragments)
+                url += urllib_urlencode(fragments)
         elif _append_slash and not url.endswith('/'):
             url += '/'
         return url

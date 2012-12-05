@@ -394,6 +394,9 @@ if PY3:
   def urllib_quote(string, safe='/'):
     return urllib.parse.quote(string, safe)
   
+  def urllib_urlencode(query, doseq = None):
+    return urllib.parse.urlencode(query, doseq)
+  
   def to_text_type(obj):
     if isinstance(obj, text_type):
       return obj
@@ -408,7 +411,10 @@ else:
   import urllib
   
   def urllib_quote(string, safe='/'):
-    return urllib.quote(string, safe)
+    return urllib.quote(string, safe)  
+  
+  def urllib_urlencode(query, doseq = None):
+    return urllib.urlencode(query, doseq)
   
   def to_text_type(obj):
     return unicode(obj)
