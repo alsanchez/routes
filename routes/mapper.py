@@ -531,8 +531,8 @@ class Mapper(SubMapperParent):
         # Setup the lists of all controllers/actions we'll add each route
         # to. We include the '*' in the case that a generate contains a
         # controller/action that has no hardcodes
-        controllerlist = controllerlist.keys() + ['*']
-        actionlist = actionlist.keys() + ['*']
+        controllerlist = list(controllerlist.keys()) + ['*']
+        actionlist = list(actionlist.keys()) + ['*']
         
         # Go through our list again, assemble the controllers/actions we'll
         # add each route to. If its hardcoded, we only add it to that dict key.
