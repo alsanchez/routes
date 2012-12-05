@@ -399,6 +399,9 @@ if PY3:
       return obj
     else:
       return str(obj)
+
+  def to_binary_type(obj):
+    return bytes(obj, "ascii")
   
 else:
   
@@ -409,6 +412,9 @@ else:
   
   def to_text_type(obj):
     return unicode(obj)
+  
+  def to_binary_type(obj):
+    return str(obj)
   
 def cmp2key(mycmp):
     "Converts a cmp= function into a key= function"

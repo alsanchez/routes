@@ -9,7 +9,7 @@ from repoze.lru import LRUCache
 from routes import request_config
 from routes.util import controller_scan, MatchException, RoutesException
 from routes.route import Route
-from routes.six import iteritems, to_text_type, cmp2key, compare
+from routes.six import iteritems, to_text_type, cmp2key, compare, binary_type, to_binary_type
 
 
 COLLECTION_ACTIONS = ['index', 'create', 'new']
@@ -393,7 +393,7 @@ class Mapper(SubMapperParent):
         def format_methods(r):
             if r.conditions:
                 method = r.conditions.get('method', '')
-                return type(method) is str and method or ', '.join(method)
+                return type(method) is binary_type and method or ', '.join(method)
             else:
                 return ''
 
@@ -816,7 +816,7 @@ class Mapper(SubMapperParent):
                 kval = kargs.get(key)
                 if not kval:
                     continue
-                if isinstance(kval, str):
+                if isinstance(kval, binary_type):
                     kval = kval.decode(self.encoding)
                 else:
                     kval = to_text_type(kval)
@@ -837,8 +837,8 @@ class Mapper(SubMapperParent):
                 else:
                     key = cache_key
                 if self.urlcache is not None:
-                    self.urlcache.put(key, str(path))
-                return str(path)
+                    self.urlcache.put(key, to_binary_type(path))
+                return to_binary_type(path)
             else:
                 continue
         return None
