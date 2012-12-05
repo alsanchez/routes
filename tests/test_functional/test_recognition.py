@@ -7,7 +7,7 @@ import urllib
 from nose.tools import eq_, assert_raises
 from routes import *
 from routes.util import RoutesException
-from routes.six import u
+from routes.six import u, urllib_quote
 
 class TestRecognition(unittest.TestCase):
     
@@ -47,7 +47,7 @@ class TestRecognition(unittest.TestCase):
     
     def test_disabling_unicode(self):
         hoge = u('\u30c6\u30b9\u30c8') # the word test in Japanese
-        hoge_enc = urllib.quote(hoge.encode('utf-8'))
+        hoge_enc = urllib_quote(hoge.encode('utf-8'))
         m = Mapper(explicit=False)
         m.minimization = True
         m.encoding = None

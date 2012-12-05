@@ -5,7 +5,7 @@ from nose.tools import eq_
 
 from routes import url_for
 from routes.mapper import Mapper
-from routes.six import u
+from routes.six import u, urllib_quote
 
 
 def test_basic():
@@ -117,7 +117,7 @@ def test_regexp_syntax():
 
 def test_unicode():
     hoge = u('\u30c6\u30b9\u30c8') # the word test in Japanese
-    hoge_enc = urllib.quote(hoge.encode('utf-8'))
+    hoge_enc = urllib_quote(hoge.encode('utf-8'))
     m = Mapper()
     m.minimization = False
     m.connect(':hoge')
@@ -126,7 +126,7 @@ def test_unicode():
 
 def test_unicode_static():
     hoge = u('\u30c6\u30b9\u30c8') # the word test in Japanese
-    hoge_enc = urllib.quote(hoge.encode('utf-8'))
+    hoge_enc = urllib_quote(hoge.encode('utf-8'))
     m = Mapper()
     m.minimization = False
     m.connect('google-jp', 'http://www.google.co.jp/search', _static=True)

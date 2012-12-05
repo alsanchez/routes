@@ -386,3 +386,12 @@ _add_doc(reraise, """Reraise an exception.""")
 def with_metaclass(meta, base=object):
     """Create a base class with a metaclass."""
     return meta("NewBase", (base,), {})
+
+if PY3:
+  import urllib.parse  
+  def urllib_quote(string, safe='/', encoding=None, errors=None):
+    return urllib.parse.quote(string, safe, encoding, errors)
+else:
+  import urllib
+  def urllib_quote(string, safe='/', encoding=None, errors=None):
+    return urllib.quote(string, safe, encoding, errors)
