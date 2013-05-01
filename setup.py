@@ -1,13 +1,24 @@
 __version__ = '1.13'
 
-import os
+import os, sys
 
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGELOG.rst')).read()
+PY3 = sys.version_info[0] == 3
 
+extra_options = {
+    "packages": find_packages(),
+    }
+
+if PY3:
+    extra_options["use_2to3"] = True
+    if "test" in sys.argv:
+        for root, directories, files in os.walk("tests"):
+            for directory in directories:
+                extra_options["packages"].append(os.path.join(root, directory))
 
 setup(name="Routes",
       version=__version__,
@@ -25,7 +36,6 @@ setup(name="Routes",
       author_email="ben@groovie.org",
       url='http://routes.groovie.org/',
       license="MIT",
-      packages=find_packages(),
       test_suite="nose.collector",
       include_package_data=True,
       zip_safe=False,
@@ -33,4 +43,5 @@ setup(name="Routes",
       install_requires=[
           "repoze.lru>=0.3"
       ],
+      **extra_options
 )
