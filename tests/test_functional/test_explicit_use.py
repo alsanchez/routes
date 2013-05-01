@@ -77,7 +77,7 @@ class TestUtils(unittest.TestCase):
         m = Mapper()
         m.explicit = True
         m.connect('/hi/{fred}')
-        
+
         environ = {'HTTP_HOST': 'localhost.com', 'PATH_INFO': '/hi/smith'}
         match = m.routematch(environ=environ)[0]
         environ['wsgiorg.routing_args'] = (None, match)

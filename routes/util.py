@@ -42,7 +42,7 @@ def _screenargs(kargs, mapper, environ, force_explicit=False):
     
     controller_name = kargs.get('controller')
     
-    if controller_name and controller_name.startswith('/'):
+    if controller_name and controller_name.startswith(b'/'):
         # If the controller name starts with '/', ignore route memory
         kargs['controller'] = kargs['controller'][1:]
         return kargs
@@ -187,14 +187,16 @@ def url_for(*args, **kargs):
     route = None
     static = False
     encoding = config.mapper.encoding
-    url = ''
+    url = b''
     if len(args) > 0:
+        assertBytes(args[0])
         route = config.mapper._routenames.get(args[0])
         
         # No named route found, assume the argument is a relative path
         if not route:
             static = True
             url = args[0]
+
         
         if url.startswith('/') and hasattr(config, 'environ') \
                 and config.environ.get('SCRIPT_NAME'):
@@ -202,7 +204,7 @@ def url_for(*args, **kargs):
         
         if static:
             if kargs:
-                url += '?'
+                url += b'?'
                 query_args = []
                 for key, val in kargs.iteritems():
                     if isinstance(val, (list, tuple)):
@@ -214,7 +216,7 @@ def url_for(*args, **kargs):
                         query_args.append("%s=%s" % (
                             urllib.quote(unicode(key).encode(encoding)),
                             urllib.quote(unicode(val).encode(encoding))))
-                url += '&'.join(query_args)
+                url += b'&'.join(query_args)
     environ = getattr(config, 'environ', {})
     if 'wsgiorg.routing_args' not in environ:
         environ = environ.copy()
@@ -247,7 +249,7 @@ def url_for(*args, **kargs):
         protocol = newargs.pop('_protocol', None) or protocol
         url = config.mapper.generate(*route_args, **newargs)
     if anchor is not None:
-        url += '#' + _url_quote(anchor, encoding)
+        url += b'#' + _url_quote(anchor, encoding)
     if host or protocol or qualified:
         if not host and not qualified:
             # Ensure we don't use a specific port, as changing the protocol
@@ -258,9 +260,9 @@ def url_for(*args, **kargs):
         if not protocol:
             protocol = config.protocol
         if url is not None:
-            url = protocol + '://' + host + url
-    
-    if not isinstance(url, str) and url is not None:
+            url = protocol + b'://' + host + url
+
+    if not isinstance(url, bytes) and url is not None:
         raise GenerationException("url_for can only return a string, got "
                         "unicode instead: %s" % url)
     if url is None:
@@ -331,7 +333,7 @@ class URLGenerator(object):
         
         static = False
         encoding = self.mapper.encoding
-        url = ''
+        url = b''
                 
         more_args = len(args) > 0
         if more_args:
@@ -340,12 +342,12 @@ class URLGenerator(object):
         if not route and more_args:
             static = True
             url = args[0]
-            if url.startswith('/') and self.environ.get('SCRIPT_NAME'):
+            if url.startswith(b'/') and self.environ.get('SCRIPT_NAME'):
                 url = self.environ.get('SCRIPT_NAME') + url
 
             if static:
                 if kargs:
-                    url += '?'
+                    url += b'?'
                     query_args = []
                     for key, val in kargs.iteritems():
                         if isinstance(val, (list, tuple)):
@@ -357,7 +359,7 @@ class URLGenerator(object):
                             query_args.append("%s=%s" % (
                                 urllib.quote(unicode(key).encode(encoding)),
                                 urllib.quote(unicode(val).encode(encoding))))
-                    url += '&'.join(query_args)
+                    url += b'&'.join(query_args)
         if not static:
             route_args = []
             if route:
@@ -392,7 +394,7 @@ class URLGenerator(object):
             newargs['_environ'] = self.environ
             url = self.mapper.generate(*route_args, **newargs)
         if anchor is not None:
-            url += '#' + _url_quote(anchor, encoding)
+            url += b'#' + _url_quote(anchor, encoding)
         if host or protocol or qualified:
             if 'routes.cached_hostinfo' not in self.environ:
                 cache_hostinfo(self.environ)
@@ -407,9 +409,9 @@ class URLGenerator(object):
             if not protocol:
                 protocol = hostinfo['protocol']
             if url is not None:
-                if host[-1] != '/':
+                if host[-1] != b'/':
                     host += '/'
-                url = protocol + '://' + host + url.lstrip('/')
+                url = protocol + b'://' + host + url.lstrip(b'/')
 
         if not isinstance(url, str) and url is not None:
             raise GenerationException("Can only return a string, got "
@@ -496,9 +498,10 @@ def controller_scan(directory=None):
                 controllers.extend(find_controllers(filename, 
                                                     prefix=prefix+fname+'/'))
         return controllers
-    def longest_first(fst, lst):
-        """Compare the length of one string to another, shortest goes first"""
-        return cmp(len(lst), len(fst))
+
     controllers = find_controllers(directory)
-    controllers.sort(longest_first)
+    controllers.sort(key=len, reverse=True)
     return controllers
+
+def assertBytes(value):
+    assert isinstance(value, bytes)

@@ -660,11 +660,15 @@ class Mapper(SubMapperParent):
             resultdict = m.match('/joe/sixpack')
         
         """
+        if environ is not None and "PATH_INFO" in environ:
+            assert(isinstance(environ["PATH_INFO"], bytes))
+
         if not url and not environ:
             raise RoutesException('URL or environ must be provided')
         
         if not url:
             url = environ['PATH_INFO']
+            assert(isinstance(url, bytes))
                 
         result = self._match(url, environ)
         if self.debug:
@@ -689,6 +693,7 @@ class Mapper(SubMapperParent):
         
         if not url:
             url = environ['PATH_INFO']
+            assert(isinstance(url, bytes))
         result = self._match(url, environ)
         if self.debug:
             return result[0], result[1], result[2]
@@ -814,7 +819,7 @@ class Mapper(SubMapperParent):
                 kval = kargs.get(key)
                 if not kval:
                     continue
-                if isinstance(kval, str):
+                if isinstance(kval, bytes):
                     kval = kval.decode(self.encoding)
                 else:
                     kval = unicode(kval)
