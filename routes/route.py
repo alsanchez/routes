@@ -5,7 +5,7 @@ import urllib
 if sys.version < '2.4':
     from sets import ImmutableSet as frozenset
 
-from routes.util import _url_quote as url_quote, _str_encode
+from routes.util import _url_quote as url_quote, _str_encode, to_unicode
 
 
 class Route(object):
@@ -135,7 +135,7 @@ class Route(object):
         """Transform the given argument into a unicode string."""
         if isinstance(s, unicode):
             return s
-        elif isinstance(s, str):
+        elif isinstance(s, bytes):
             return s.decode(self.encoding)
         elif callable(s):
             return s
@@ -556,10 +556,11 @@ class Route(object):
             if key != 'path_info' and self.encoding:
                 # change back into python unicode objects from the URL 
                 # representation
-                try:
-                    val = val and val.decode(self.encoding, self.decode_errors)
-                except UnicodeDecodeError:
-                    return False
+                if val and isinstance(val, bytes):
+                    try:
+                        val = val.decode(self.encoding, self.decode_errors)
+                    except UnicodeDecodeError:
+                        return False
             
             if not val and key in self.defaults and self.defaults[key]:
                 result[key] = self.defaults[key]
@@ -653,7 +654,8 @@ class Route(object):
                 # No arg at all? This won't work
                 else:
                     return False
-                    
+
+                val = to_unicode(val, self.encoding)
                 urllist.append(url_quote(val, self.encoding))
                 if part['type'] == '.':
                     urllist.append('.')
@@ -700,17 +702,21 @@ class Route(object):
         # Verify that if we have a method arg, its in the method accept list. 
         # Also, method will be changed to _method for route generation
         meth = kargs.get('method')
+
+        if isinstance(meth, bytes):
+            meth = meth.decode(self.encoding)
+
         if meth:
             if self.conditions and 'method' in self.conditions \
                 and meth.upper() not in self.conditions['method']:
                 return False
             kargs.pop('method')
-        
+
         if self.minimization:
             url = self.generate_minimized(kargs)
         else:
             url = self.generate_non_minimized(kargs)
-        
+
         if url is False:
             return url
         
@@ -731,8 +737,10 @@ class Route(object):
                 val = kargs[key]
                 if isinstance(val, (tuple, list)):
                     for value in val:
+                        value = to_unicode(value, self.encoding)
                         fragments.append((key, _str_encode(value, self.encoding)))
                 else:
+                    val = to_unicode(val, self.encoding)
                     fragments.append((key, _str_encode(val, self.encoding)))
             if fragments:
                 url += '?'

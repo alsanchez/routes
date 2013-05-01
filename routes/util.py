@@ -40,7 +40,7 @@ def _screenargs(kargs, mapper, environ, force_explicit=False):
     elif mapper.explicit and not force_explicit:
         return kargs
     
-    controller_name = kargs.get('controller')
+    controller_name = to_unicode(kargs.get('controller'), encoding)
     
     if controller_name and controller_name.startswith('/'):
         # If the controller name starts with '/', ignore route memory
@@ -92,6 +92,7 @@ def _subdomain_check(kargs, mapper, environ):
             port += ':' + hostmatch[1]
         sub_match = re.compile('^.+?\.(%s)$' % mapper.domain_match)
         domain = re.sub(sub_match, r'\1', host)
+        subdomain = to_unicode(subdomain, mapper.encoding)
         if subdomain and not host.startswith(subdomain) and \
             subdomain not in mapper.sub_domains_ignore:
             kargs['_host'] = subdomain + '.' + domain + port
@@ -242,6 +243,7 @@ def url_for(*args, **kargs):
                 newargs = _subdomain_check(newargs, config.mapper, environ)
         else:
             newargs = _screenargs(kargs, config.mapper, environ)
+
         anchor = newargs.pop('_anchor', None) or anchor
         host = newargs.pop('_host', None) or host
         protocol = newargs.pop('_protocol', None) or protocol
@@ -259,8 +261,8 @@ def url_for(*args, **kargs):
             protocol = config.protocol
         if url is not None:
             url = protocol + '://' + host + url
-    
-    if not isinstance(url, str) and url is not None:
+
+    if not ascii_characters(url) and url is not None:
         raise GenerationException("url_for can only return a string, got "
                         "unicode instead: %s" % url)
     if url is None:
@@ -411,7 +413,7 @@ class URLGenerator(object):
                     host += '/'
                 url = protocol + '://' + host + url.lstrip('/')
 
-        if not isinstance(url, str) and url is not None:
+        if not ascii_characters(url) and url is not None:
             raise GenerationException("Can only return a string, got "
                             "unicode instead: %s" % url)
         if url is None:
@@ -496,9 +498,38 @@ def controller_scan(directory=None):
                 controllers.extend(find_controllers(filename, 
                                                     prefix=prefix+fname+'/'))
         return controllers
-    def longest_first(fst, lst):
-        """Compare the length of one string to another, shortest goes first"""
-        return cmp(len(lst), len(fst))
     controllers = find_controllers(directory)
-    controllers.sort(longest_first)
+    # Sort by string length, shortest goes first
+    controllers.sort(key=len, reverse=True)
     return controllers
+
+def cmp2key(mycmp):
+    "Converts a cmp= function into a key= function"
+    class K:
+        def __init__(self, obj, *args):
+            self.obj = obj
+        def __lt__(self, other):
+            return mycmp(self.obj, other.obj) < 0
+    return K
+
+def compare(obj1, obj2):
+    if obj1 < obj2:
+        return -1
+    elif obj1  <obj2:
+        return 1
+    else:
+        return 0
+
+def to_unicode(value, encoding):
+
+    if isinstance(value, bytes):
+        return value.decode(encoding)
+
+    return value
+
+def ascii_characters(string):
+
+    if string is None:
+        return True
+
+    return all(ord(c) < 128 for c in string)

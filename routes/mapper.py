@@ -9,6 +9,7 @@ from repoze.lru import LRUCache
 from routes import request_config
 from routes.util import controller_scan, MatchException, RoutesException
 from routes.route import Route
+from routes.util import compare, cmp2key, to_unicode
 
 
 COLLECTION_ACTIONS = ['index', 'create', 'new']
@@ -728,22 +729,26 @@ class Mapper(SubMapperParent):
         # both SCRIPT_NAME and kargs:
         cache_key = unicode(args).encode('utf8') + \
             unicode(kargs).encode('utf8')
-        
+
         if self.urlcache is not None:
             if self.environ:
                 cache_key_script_name = '%s:%s' % (
                     environ.get('SCRIPT_NAME', ''), cache_key)
             else:
                 cache_key_script_name = cache_key
-        
+
             # Check the url cache to see if it exists, use it if it does
             for key in [cache_key, cache_key_script_name]:
                 val = self.urlcache.get(key, self)
                 if val != self:
                     return val
-        
+
+        controller = to_unicode(controller, self.encoding)
+        action = to_unicode(action, self.encoding)
+
         actionlist = self._gendict.get(controller) or self._gendict.get('*', {})
         if not actionlist and not args:
+            print(0)
             return None
         (keylist, sortcache) = actionlist.get(action) or \
                                actionlist.get('*', (None, {}))
@@ -789,20 +794,20 @@ class Mapper(SubMapperParent):
                 
                 # Neither matches exactly, return the one with the most in 
                 # common
-                if cmp(lendiffa, lendiffb) != 0:
-                    return cmp(lendiffa, lendiffb)
+                if compare(lendiffa, lendiffb) != 0:
+                    return compare(lendiffa, lendiffb)
                 
                 # Neither matches exactly, but if they both have just as much 
                 # in common
                 if len(keys&b) == len(keys&a):
                     # Then we return the shortest of the two
-                    return cmp(len(a), len(b))
+                    return compare(len(a), len(b))
                 
                 # Otherwise, we return the one that has the most in common
                 else:
-                    return cmp(len(keys&b), len(keys&a))
+                    return compare(len(keys&b), len(keys&a))
             
-            keylist.sort(keysort)
+            keylist.sort(key=cmp2key(keysort))
             if cacheset:
                 sortcache[cachekey] = keylist
                 
@@ -814,7 +819,7 @@ class Mapper(SubMapperParent):
                 kval = kargs.get(key)
                 if not kval:
                     continue
-                if isinstance(kval, str):
+                if isinstance(kval, bytes):
                     kval = kval.decode(self.encoding)
                 else:
                     kval = unicode(kval)
