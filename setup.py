@@ -16,8 +16,9 @@ extra_options = {
 if PY3:
     extra_options["use_2to3"] = True
     if "test" in sys.argv:
-        extra_options["packages"] += ["tests/test_units", "tests/test_functional"]
-
+        for root, directories, files in os.walk("tests"):
+            for directory in directories:
+                extra_options["packages"].append(os.path.join(root, directory))
 
 setup(name="Routes",
       version=__version__,
