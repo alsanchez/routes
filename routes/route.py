@@ -706,12 +706,12 @@ class Route(object):
                 and meth.upper() not in self.conditions['method']:
                 return False
             kargs.pop('method')
-
+        
         if self.minimization:
             url = self.generate_minimized(kargs)
         else:
             url = self.generate_non_minimized(kargs)
-
+        
         if url is False:
             return url
         
