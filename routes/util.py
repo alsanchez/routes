@@ -503,10 +503,10 @@ def controller_scan(directory=None):
     controllers.sort(key=len, reverse=True)
     return controllers
 
-def as_unicode(value, encoding):
+def as_unicode(value, encoding, errors='strict'):
 
     if value is not None and isinstance(value, bytes):
-        return value.decode(encoding)
+        return value.decode(encoding, errors=errors)
 
     return value
 

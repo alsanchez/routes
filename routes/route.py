@@ -557,7 +557,7 @@ class Route(object):
                 # change back into python unicode objects from the URL 
                 # representation
                 try:
-                    val = as_unicode(val, self.encoding)
+                    val = as_unicode(val, self.encoding, self.decode_errors)
                 except UnicodeDecodeError:
                     return False
             
