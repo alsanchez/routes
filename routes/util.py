@@ -261,7 +261,7 @@ def url_for(*args, **kargs):
             protocol = config.protocol
         if url is not None:
             url = protocol + '://' + host + url
-
+    
     if not ascii_characters(url) and url is not None:
         raise GenerationException("url_for can only return a string, got "
                         "unicode instead: %s" % url)
@@ -505,7 +505,7 @@ def controller_scan(directory=None):
 
 def as_unicode(value, encoding):
 
-    if isinstance(value, bytes):
+    if value is not None and isinstance(value, bytes):
         return value.decode(encoding)
 
     return value

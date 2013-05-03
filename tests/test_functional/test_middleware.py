@@ -20,7 +20,8 @@ def test_basic():
     assert b'matchdict items are []' in res
     
     res = app.get('/content')
-    assert b"matchdict items are [('action', 'index'), ('controller', " + repr(u'content').encode() + b"), ('id', None)]" in res
+    assert b"matchdict items are [('action', 'index'), ('controller', " + repr(
+        u'content').encode() + b"), ('id', None)]" in res
 
 def test_no_query():
     map = Mapper(explicit=False)

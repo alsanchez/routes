@@ -728,20 +728,20 @@ class Mapper(SubMapperParent):
         # both SCRIPT_NAME and kargs:
         cache_key = unicode(args).encode('utf8') + \
             unicode(kargs).encode('utf8')
-
+        
         if self.urlcache is not None:
             if self.environ:
                 cache_key_script_name = '%s:%s' % (
                     environ.get('SCRIPT_NAME', ''), cache_key)
             else:
                 cache_key_script_name = cache_key
-
+        
             # Check the url cache to see if it exists, use it if it does
             for key in [cache_key, cache_key_script_name]:
                 val = self.urlcache.get(key, self)
                 if val != self:
                     return val
-
+        
         controller = as_unicode(controller, self.encoding)
         action = as_unicode(action, self.encoding)
 
@@ -833,7 +833,7 @@ class Mapper(SubMapperParent):
                 kval = kargs.get(key)
                 if not kval:
                     continue
-                kval = as_unicode(kval)
+                kval = as_unicode(kval, self.encoding)
                 if kval != route.defaults[key] and not callable(route.defaults[key]):
                     fail = True
                     break

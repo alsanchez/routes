@@ -556,11 +556,10 @@ class Route(object):
             if key != 'path_info' and self.encoding:
                 # change back into python unicode objects from the URL 
                 # representation
-                if val and isinstance(val, bytes):
-                    try:
-                        val = val.decode(self.encoding, self.decode_errors)
-                    except UnicodeDecodeError:
-                        return False
+                try:
+                    val = as_unicode(val, self.encoding)
+                except UnicodeDecodeError:
+                    return False
             
             if not val and key in self.defaults and self.defaults[key]:
                 result[key] = self.defaults[key]
@@ -654,7 +653,7 @@ class Route(object):
                 # No arg at all? This won't work
                 else:
                     return False
-
+                    
                 val = as_unicode(val, self.encoding)
                 urllist.append(url_quote(val, self.encoding))
                 if part['type'] == '.':
@@ -701,11 +700,7 @@ class Route(object):
         
         # Verify that if we have a method arg, its in the method accept list. 
         # Also, method will be changed to _method for route generation
-        meth = kargs.get('method')
-
-        if isinstance(meth, bytes):
-            meth = meth.decode(self.encoding)
-
+        meth = as_unicode(kargs.get('method'), self.encoding)
         if meth:
             if self.conditions and 'method' in self.conditions \
                 and meth.upper() not in self.conditions['method']:
