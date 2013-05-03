@@ -7,9 +7,8 @@ import pkg_resources
 from repoze.lru import LRUCache
 
 from routes import request_config
-from routes.util import controller_scan, MatchException, RoutesException
+from routes.util import controller_scan, MatchException, RoutesException, as_unicode
 from routes.route import Route
-from routes.util import as_unicode
 
 
 COLLECTION_ACTIONS = ['index', 'create', 'new']
@@ -748,7 +747,6 @@ class Mapper(SubMapperParent):
 
         actionlist = self._gendict.get(controller) or self._gendict.get('*', {})
         if not actionlist and not args:
-            print(0)
             return None
         (keylist, sortcache) = actionlist.get(action) or \
                                actionlist.get('*', (None, {}))
@@ -835,10 +833,7 @@ class Mapper(SubMapperParent):
                 kval = kargs.get(key)
                 if not kval:
                     continue
-                if isinstance(kval, bytes):
-                    kval = kval.decode(self.encoding)
-                else:
-                    kval = unicode(kval)
+                kval = as_unicode(kval)
                 if kval != route.defaults[key] and not callable(route.defaults[key]):
                     fail = True
                     break
