@@ -5,7 +5,7 @@ import urllib
 if sys.version < '2.4':
     from sets import ImmutableSet as frozenset
 
-from routes.util import _url_quote as url_quote, _str_encode, to_unicode
+from routes.util import _url_quote as url_quote, _str_encode, as_unicode
 
 
 class Route(object):
@@ -655,7 +655,7 @@ class Route(object):
                 else:
                     return False
 
-                val = to_unicode(val, self.encoding)
+                val = as_unicode(val, self.encoding)
                 urllist.append(url_quote(val, self.encoding))
                 if part['type'] == '.':
                     urllist.append('.')
@@ -737,10 +737,10 @@ class Route(object):
                 val = kargs[key]
                 if isinstance(val, (tuple, list)):
                     for value in val:
-                        value = to_unicode(value, self.encoding)
+                        value = as_unicode(value, self.encoding)
                         fragments.append((key, _str_encode(value, self.encoding)))
                 else:
-                    val = to_unicode(val, self.encoding)
+                    val = as_unicode(val, self.encoding)
                     fragments.append((key, _str_encode(val, self.encoding)))
             if fragments:
                 url += '?'

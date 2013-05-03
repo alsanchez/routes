@@ -9,7 +9,7 @@ from repoze.lru import LRUCache
 from routes import request_config
 from routes.util import controller_scan, MatchException, RoutesException
 from routes.route import Route
-from routes.util import compare, cmp2key, to_unicode
+from routes.util import as_unicode
 
 
 COLLECTION_ACTIONS = ['index', 'create', 'new']
@@ -743,8 +743,8 @@ class Mapper(SubMapperParent):
                 if val != self:
                     return val
 
-        controller = to_unicode(controller, self.encoding)
-        action = to_unicode(action, self.encoding)
+        controller = as_unicode(controller, self.encoding)
+        action = as_unicode(action, self.encoding)
 
         actionlist = self._gendict.get(controller) or self._gendict.get('*', {})
         if not actionlist and not args:
@@ -770,44 +770,60 @@ class Mapper(SubMapperParent):
                 if len(route.minkeys - route.dotkeys - keys) == 0:
                     newlist.append(route)
             keylist = newlist
+
+            class KeySorter:
+
+                def __init__(self, obj, *args):
+                    self.obj = obj
+
+                def __lt__(self, other):
+                    return self._keysort(self.obj, other.obj) < 0
             
-            def keysort(a, b):
-                """Sorts two sets of sets, to order them ideally for
-                matching."""
-                am = a.minkeys
-                a = a.maxkeys
-                b = b.maxkeys
-                
-                lendiffa = len(keys^a)
-                lendiffb = len(keys^b)
-                # If they both match, don't switch them
-                if lendiffa == 0 and lendiffb == 0:
-                    return 0
-                
-                # First, if a matches exactly, use it
-                if lendiffa == 0:
-                    return -1
-                
-                # Or b matches exactly, use it
-                if lendiffb == 0:
-                    return 1
-                
-                # Neither matches exactly, return the one with the most in 
-                # common
-                if compare(lendiffa, lendiffb) != 0:
-                    return compare(lendiffa, lendiffb)
-                
-                # Neither matches exactly, but if they both have just as much 
-                # in common
-                if len(keys&b) == len(keys&a):
-                    # Then we return the shortest of the two
-                    return compare(len(a), len(b))
-                
-                # Otherwise, we return the one that has the most in common
-                else:
-                    return compare(len(keys&b), len(keys&a))
+                def _keysort(self, a, b):
+                    """Sorts two sets of sets, to order them ideally for
+                    matching."""
+                    am = a.minkeys
+                    a = a.maxkeys
+                    b = b.maxkeys
+
+                    lendiffa = len(keys^a)
+                    lendiffb = len(keys^b)
+                    # If they both match, don't switch them
+                    if lendiffa == 0 and lendiffb == 0:
+                        return 0
+
+                    # First, if a matches exactly, use it
+                    if lendiffa == 0:
+                        return -1
+
+                    # Or b matches exactly, use it
+                    if lendiffb == 0:
+                        return 1
+
+                    # Neither matches exactly, return the one with the most in
+                    # common
+                    if self._compare(lendiffa, lendiffb) != 0:
+                        return self._compare(lendiffa, lendiffb)
+
+                    # Neither matches exactly, but if they both have just as much
+                    # in common
+                    if len(keys&b) == len(keys&a):
+                        # Then we return the shortest of the two
+                        return self._compare(len(a), len(b))
+
+                    # Otherwise, we return the one that has the most in common
+                    else:
+                        return self._compare(len(keys&b), len(keys&a))
+
+                def _compare(self, obj1, obj2):
+                    if obj1 < obj2:
+                        return -1
+                    elif obj1 < obj2:
+                        return 1
+                    else:
+                        return 0
             
-            keylist.sort(key=cmp2key(keysort))
+            keylist.sort(key=KeySorter)
             if cacheset:
                 sortcache[cachekey] = keylist
                 
