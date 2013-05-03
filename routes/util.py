@@ -243,7 +243,6 @@ def url_for(*args, **kargs):
                 newargs = _subdomain_check(newargs, config.mapper, environ)
         else:
             newargs = _screenargs(kargs, config.mapper, environ)
-
         anchor = newargs.pop('_anchor', None) or anchor
         host = newargs.pop('_host', None) or host
         protocol = newargs.pop('_protocol', None) or protocol
@@ -506,7 +505,7 @@ def controller_scan(directory=None):
 def as_unicode(value, encoding, errors='strict'):
 
     if value is not None and isinstance(value, bytes):
-        return value.decode(encoding, errors=errors)
+        return value.decode(encoding, errors)
 
     return value
 
